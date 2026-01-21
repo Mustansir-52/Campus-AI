@@ -1,0 +1,548 @@
+/* =============================
+   CAMPUS AI - THEME: PRO MONOCHROME GLASS
+   High-end glass effect on a sophisticated grayish-black background.
+   ============================= */
+:root {
+  /* --- New Background Palette (Grayish Black) --- */
+  --bg-main: #121212; /* Near pure black */
+  --bg-secondary: #1e1e24; /* A subtle rich charcoal gray */
+
+  /* Refined Glass Surfaces */
+  /* Kept slightly cool-tinted for contrast against the warm gray background */
+  --glass-surface: rgba(35, 35, 45, 0.5);
+  --glass-blur: blur(20px);
+
+  /* Advanced Lighting Borders - Key for depth */
+  /* A faint white light on top edge, faint dark shadow on bottom */
+  --glass-edge-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  --glass-edge-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+  --border-faint: 1px solid rgba(255, 255, 255, 0.05);
+
+  /* Vibrant accents pop more against the monochrome background */
+  --accent-grad: linear-gradient(135deg, #7C3AED, #3B82F6);
+  --accent-glow: 0 4px 15px -3px rgba(124, 58, 237, 0.6);
+
+  --text-bright: #ffffff;
+  --text-muted: #a1a1aa; /* Neutral zinc gray text */
+  --radius-xl: 24px;
+  --radius-md: 18px;
+}
+
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* New subtle grayish-black gradient background */
+  background: linear-gradient(to bottom right, var(--bg-secondary), var(--bg-main));
+  color: var(--text-bright);
+  display: block;
+}
+
+/* Main container */
+.ai-app {
+  width: 94%; max-width: 850px; margin: 0 auto;
+  height: 100vh; display: flex; flex-direction: column;
+  padding: 15px 0; box-sizing: border-box; gap: 12px;
+}
+
+
+/* ---------- HEADER ---------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* <-- THIS FIXES IT */
+  padding: 14px 24px;
+  border-radius: var(--radius-xl);
+  background: var(--glass-surface);
+  backdrop-filter: var(--glass-blur);
+  border-top: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid rgba(0,0,0,0.3);
+  box-shadow: var(--glass-edge-shadow);
+}
+
+
+.app-logo {
+  width: 46px; height: 46px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.app-header h1 {
+    margin: 0; font-size: 17px; font-weight: 600;
+    letter-spacing: -0.3px;
+}
+.app-header p {
+    margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);
+    font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+.clear-btn {
+  margin-left: auto; padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted); border: var(--border-faint);
+  border-radius: 30px; cursor: pointer; transition: 0.3s all ease;
+  font-size: 12px; font-weight: 600;
+}
+.clear-btn:hover {
+    background: rgba(255, 255, 255, 0.15); color: white;
+    box-shadow: 0 2px 8px rgba(255,255,255,0.1);
+}
+
+
+/* ---------- CHAT AREA ---------- */
+.chat-area {
+  flex: 1; padding: 10px 20px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 16px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.row { display: flex; max-width: 85%; animation: fadeUp 0.3s ease;}
+@keyframes fadeUp { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);}}
+
+.row.user { align-self: flex-end; justify-content: flex-end; }
+.row.bot { align-self: flex-start; }
+
+.bubble {
+  padding: 14px 18px; border-radius: var(--radius-md);
+  font-size: 15px; line-height: 1.5;
+}
+
+/* Rich User Bubble */
+.bubble.user {
+  background: var(--accent-grad);
+  color: white; border: none;
+  border-bottom-right-radius: 4px;
+  box-shadow: var(--accent-glow);
+}
+
+/* Frosted Bot Bubble */
+.bubble.bot {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  color: var(--text-bright);
+  border: var(--border-faint);
+  /* Subtle highlight on top edge of bubble */
+  box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.05);
+  border-bottom-left-radius: 4px;
+}
+
+.meta { margin-top: 6px; font-size: 11px; color: var(--text-muted); opacity: 0.8;}
+.row.user .meta { text-align: right; }
+.typing-dots span { background: #7C3AED; }
+
+
+/* ---------- FOOTER ---------- */
+.app-footer {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; border-radius: var(--radius-xl);
+  background: var(--glass-surface);
+  backdrop-filter: blur(25px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--glass-edge-shadow);
+}
+
+/* Recessed Input Field */
+#msg {
+  flex: 1; padding: 14px 20px;
+  border-radius: 30px;
+  /* Darker inner tint for contrast against the new background */
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+  border: var(--border-faint);
+  color: white; outline: none; font-size: 15px; transition: 0.3s;
+}
+#msg:focus {
+    background: rgba(0,0,0,0.5);
+    border-color: rgba(124, 58, 237, 0.6);
+}
+#msg::placeholder { color: rgba(255,255,255,0.3); }
+
+.icon-btn, .send-btn {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  border: none; cursor: pointer; transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icon-btn {
+    background: rgba(255,255,255,0.05); color: #a78bfa; font-size: 20px;
+    border: var(--border-faint);
+}
+.icon-btn:hover { background: rgba(255,255,255,0.1); color: white; transform: scale(1.05);}
+
+.send-btn {
+  background: var(--accent-grad); color: white; font-size: 18px;
+  box-shadow: var(--accent-glow);
+  padding-left: 4px;
+}
+.send-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.7);}
+.send-btn:active { transform: scale(0.95); }
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 720px) {
+  .ai-app { padding: 10px; gap: 10px; }
+  .app-header { padding: 12px 16px; border-radius: 18px; gap: 12px;}
+  .app-logo { width: 40px; height: 40px; }
+  .chat-area { padding: 10px 15px; }
+  .app-footer { border-radius: 18px; padding: 10px;}
+  .bubble { padding: 12px 16px; font-size: 14px; }
+  .icon-btn, .send-btn { width: 44px; height: 44px; }
+  #msg { padding: 12px 16px; }
+}
+/* =============================
+   LOADING SCREEN COMPONENT
+   ============================= */
+
+/* 1. The Full Screen Overlay (Centers the loader) */
+#loading-screen {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg-main); /* Matches your dark theme bg */
+  z-index: 9999; /* Sits on top of everything */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+/* 2. Your Loader Wrapper */
+.loader-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 180px;
+  font-family: "Inter", sans-serif;
+  font-size: 1.2em;
+  font-weight: 300;
+  color: white;
+  border-radius: 50%;
+  background-color: transparent;
+  user-select: none;
+}
+
+/* 3. The Rotating Ring */
+.loader {
+  position: absolute;
+  top: 0; left: 0; width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: transparent;
+  animation: loader-rotate 2s linear infinite;
+  z-index: 0;
+}
+
+/* 4. Animation Colors (Updated to match Pro Theme) */
+@keyframes loader-rotate {
+  0% {
+    transform: rotate(90deg);
+    box-shadow:
+      0 10px 20px 0 rgba(255,255,255,0.1) inset,
+      0 20px 30px 0 #7C3AED inset, /* Violet */
+      0 60px 60px 0 #1e1e24 inset; /* Dark Gray */
+  }
+  50% {
+    transform: rotate(270deg);
+    box-shadow:
+      0 10px 20px 0 rgba(255,255,255,0.1) inset,
+      0 20px 10px 0 #3B82F6 inset, /* Blue */
+      0 40px 60px 0 #121212 inset; /* Black */
+  }
+  100% {
+    transform: rotate(450deg);
+    box-shadow:
+      0 10px 20px 0 rgba(255,255,255,0.1) inset,
+      0 20px 30px 0 #7C3AED inset, /* Violet */
+      0 60px 60px 0 #1e1e24 inset;
+  }
+}
+
+/* 5. The Letters */
+.loader-letter {
+  display: inline-block;
+  opacity: 0.4;
+  animation: loader-letter-anim 2s infinite;
+  z-index: 1;
+}
+
+/* Stagger delays for "CAMPUS AI" (8 letters + space) */
+.loader-letter:nth-child(1) { animation-delay: 0s; }
+.loader-letter:nth-child(2) { animation-delay: 0.1s; }
+.loader-letter:nth-child(3) { animation-delay: 0.2s; }
+.loader-letter:nth-child(4) { animation-delay: 0.3s; }
+.loader-letter:nth-child(5) { animation-delay: 0.4s; }
+.loader-letter:nth-child(6) { animation-delay: 0.5s; }
+.loader-letter:nth-child(7) { animation-delay: 0.6s; }
+.loader-letter:nth-child(8) { animation-delay: 0.7s; }
+.loader-letter:nth-child(9) { animation-delay: 0.8s; }
+
+@keyframes loader-letter-anim {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  20% { opacity: 1; transform: scale(1.15); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+  40% { opacity: 0.7; transform: translateY(0); }
+}
+
+/* Utility to hide it via JS */
+.hidden-loader {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* =============================
+   FANCY GLOWING INPUT (Adapted)
+   ============================= */
+
+/* Wrapper for the input to control flex sizing */
+#poda {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex: 1; /* This makes it stretch to fill the footer */
+  margin-right: 10px; /* Space between input and buttons */
+}
+
+/* The actual input field */
+.input {
+  background-color: transparent; /* Transparent so we see the glow behind */
+  border: none;
+  width: 100%;
+  height: 56px;
+  border-radius: 10px;
+  color: white;
+  padding-left: 50px; /* Space for search icon */
+  padding-right: 15px;
+  font-size: 15px;
+  z-index: 10;
+  position: relative;
+}
+
+.input::placeholder { color: #6b7280; }
+.input:focus { outline: none; }
+
+/* --- The Layers (Glows & Borders) --- */
+/* Set width to 100% so it fits your chat footer */
+.white, .border, .darkBorderBg, .glow {
+  max-height: 70px;
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  overflow: hidden;
+  z-index: -1;
+  border-radius: 12px;
+  filter: blur(3px);
+}
+
+.fancy-input-wrapper {
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+#search-icon {
+  position: absolute;
+  left: 15px;
+  top: 16px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* --- Animation Gradients (Updated to Violet/Blue) --- */
+
+/* 1. The White/Light Layer */
+.white {
+  max-height: 63px;
+  max-width: 99%;
+  border-radius: 10px;
+  filter: blur(2px);
+}
+.white::before {
+  content: "";
+  z-index: -2;
+  text-align: center;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(83deg);
+  position: absolute;
+  width: 1000px; /* Increased size for responsiveness */
+  height: 1000px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  filter: brightness(1.4);
+  background-image: conic-gradient(
+    rgba(0,0,0,0) 0%,
+    #a099d8,
+    rgba(0,0,0,0) 8%,
+    rgba(0,0,0,0) 50%,
+    #7C3AED, /* Changed from Pink to Violet */
+    rgba(0,0,0,0) 58%
+  );
+  transition: all 2s;
+}
+
+/* 2. The Border Layer */
+.border {
+  max-height: 59px;
+  max-width: 99%;
+  border-radius: 11px;
+  filter: blur(0.5px);
+}
+.border::before {
+  content: "";
+  z-index: -2;
+  text-align: center;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(70deg);
+  position: absolute;
+  width: 1000px;
+  height: 1000px;
+  filter: brightness(1.3);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-image: conic-gradient(
+    #1c191c,
+    #3B82F6 5%, /* Blue */
+    #1c191c 14%,
+    #1c191c 50%,
+    #7C3AED 60%, /* Violet */
+    #1c191c 64%
+  );
+  transition: all 2s;
+}
+
+/* 3. The Dark Background Layer */
+.darkBorderBg { max-height: 65px; max-width: 99%; }
+.darkBorderBg::before {
+  content: "";
+  z-index: -2;
+  text-align: center;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(82deg);
+  position: absolute;
+  width: 1000px;
+  height: 1000px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-image: conic-gradient(
+    rgba(0,0,0,0),
+    #18116a,
+    rgba(0,0,0,0) 10%,
+    rgba(0,0,0,0) 50%,
+    #6e1b60,
+    rgba(0,0,0,0) 60%
+  );
+  transition: all 2s;
+}
+
+/* 4. The Outer Glow */
+.glow {
+  overflow: hidden;
+  filter: blur(30px);
+  opacity: 0.4;
+  max-height: 130px;
+  max-width: 354px;
+}
+.glow:before {
+  content: "";
+  z-index: -2;
+  text-align: center;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(60deg);
+  position: absolute;
+  width: 1000px;
+  height: 1000px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-image: conic-gradient(
+    #000,
+    #3B82F6 5%, /* Blue */
+    #000 38%,
+    #000 50%,
+    #7C3AED 60%, /* Violet */
+    #000 87%
+  );
+  transition: all 2s;
+}
+
+/* --- Hover Animations --- */
+#poda:hover > .darkBorderBg::before { transform: translate(-50%, -50%) rotate(262deg); }
+#poda:hover > .glow::before { transform: translate(-50%, -50%) rotate(240deg); }
+#poda:hover > .white::before { transform: translate(-50%, -50%) rotate(263deg); }
+#poda:hover > .border::before { transform: translate(-50%, -50%) rotate(250deg); }
+
+/* --- Focus Animations --- */
+#poda:focus-within > .darkBorderBg::before { transform: translate(-50%, -50%) rotate(442deg); transition: all 4s; }
+#poda:focus-within > .glow::before { transform: translate(-50%, -50%) rotate(420deg); transition: all 4s; }
+#poda:focus-within > .white::before { transform: translate(-50%, -50%) rotate(443deg); transition: all 4s; }
+#poda:focus-within > .border::before { transform: translate(-50%, -50%) rotate(430deg); transition: all 4s; }
+
+/* =============================
+   ICON ALIGNMENT FIXES (Add to bottom of style.css)
+   ============================= */
+
+/* 1. Fix the Search Icon Position */
+#search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%; /* Moves top edge to middle */
+  transform: translateY(-50%); /* Pulls it back up by half its height to center perfectly */
+  z-index: 20;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 2. Color the Search Icon Gray (instead of black) */
+#search-icon svg {
+  stroke: #9ca3af; 
+}
+
+/* 3. Make sure the Text doesn't type over the Search Icon */
+.input {
+  padding-left: 54px !important; /* Forces text to start after the icon */
+}
+
+/* 4. Fix the Voice (Microphone) Button */
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex; /* Flexbox centers the SVG icon */
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05); /* Subtle glass background */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a78bfa; /* Violet color */
+  cursor: pointer;
+  margin-left: 0; /* Reset margins if any */
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* 5. Fix the Send Button Alignment */
+.send-btn {
+  display: flex; /* Flexbox centers the SVG icon */
+  justify-content: center;
+  align-items: center;
+  padding: 0; /* Remove old padding that offsets the icon */
+}
+
+/* ==========================================
+   MICROPHONE BUTTON FIX (FINAL WORKING PATCH)
+   ========================================== */
+
+.white,
+.border,
+.darkBorderBg,
+.glow {
+    pointer-events: none !important;
+}
+
+#voice {
+  
+    position: relative;
+    z-index: 9999 !important;
+}

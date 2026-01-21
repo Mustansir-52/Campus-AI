@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Campus AI Chat</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="loading-screen">
+  <div class="loader-wrapper">
+    <div class="loader"></div>
+    <span class="loader-letter">C</span>
+    <span class="loader-letter">A</span>
+    <span class="loader-letter">M</span>
+    <span class="loader-letter">P</span>
+    <span class="loader-letter">U</span>
+    <span class="loader-letter">S</span>
+    <span class="loader-letter">&nbsp;</span>
+    <span class="loader-letter">A</span>
+    <span class="loader-letter">I</span>
+  </div>
+</div>
+<div class="ai-app">
+  <header class="app-header">
+    <img src="clg_logo.png" class="app-logo" />
+    <div class="name">
+      <h1>The New College</h1>
+      <p>Smart Assistant</p>
+    </div>
+    <button id="clear-chat" class="icon-btn">clear</button>
+  </header>
+  <main id="chat-area" class="chat-area"></main>
+  <footer class="app-footer">
+    <div id="poda">
+      <div class="glow"></div>
+      <div class="darkBorderBg"></div>
+      <div class="darkBorderBg"></div>
+      <div class="darkBorderBg"></div>
+      <div class="white"></div>
+      <div class="border"></div>
+      <div class="fancy-input-wrapper">
+        <div id="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: #9ca3af;">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <input id="msg" type="text" placeholder="Ask anything..." class="input" autocomplete="off" />
+      </div>
+    </div>
+    <div class="mic">
+        <button id="voice" class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </button>
+    </div>
+    <button id="send" class="send-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </footer>
+</div>
+<script>
+window.addEventListener("load", () => {
+  const loader = document.getElementById("loading-screen");
+  // Small delay so users can admire your animation
+  setTimeout(() => {
+    loader.classList.add("hidden-loader");
+  }, 1500); // 1.5 seconds
+});
+
+const BACKEND_URL = "https://newclg-bot-backend.onrender.com/chat"; 
+const STORAGE_KEY = "campus_ai_college_msgs_v1";
+const SESSION_KEY = "campus_ai_college_session_v1";
+
+// DOM Elements
+const messagesEl = document.getElementById("chat-area");
+const inputEl = document.getElementById("msg");
+const sendBtn = document.getElementById("send");
+const voiceBtn = document.getElementById("voice");
+const suggestionsEl = document.querySelector(".suggestions");
+const clearBtn = document.getElementById("clear-chat");
+
+// Create / Restore Session
+let sessionId = localStorage.getItem(SESSION_KEY);
+if (!sessionId) {
+  sessionId = "sess_" + Math.random().toString(36).slice(2, 10);
+  localStorage.setItem(SESSION_KEY, sessionId);
+}
+
+let messages = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+// Utility
+function esc(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+}
+
+// Build Message Row
+function makeRow(m) {
+  const row = document.createElement("div");
+  row.className = "row " + (m.sender === "user" ? "user" : "bot");
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble " + (m.sender === "user" ? "user" : "bot");
+  bubble.innerHTML = esc(m.text).replace(/\n/g, "<br>");
+
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.textContent = new Date(m.ts || Date.now()).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+  bubble.appendChild(meta);
+
+  row.appendChild(bubble);
+  return row;
+}
+
+function renderAll() {
+  messagesEl.innerHTML = "";
+  messages.forEach((m) => messagesEl.appendChild(makeRow(m)));
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+// Typing Indicator
+let typingNode = null;
+function showTyping(on = true) {
+  if (on) {
+    if (!typingNode) {
+      typingNode = document.createElement("div");
+      typingNode.className = "row bot typing";
+      typingNode.innerHTML = `
+        <div class="bubble bot">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      `;
+      messagesEl.appendChild(typingNode);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+  } else {
+    if (typingNode) typingNode.remove();
+    typingNode = null;
+  }
+}
+
+// Send + Backend POST
+async function sendMessage(text) {
+  if (!text.trim()) return;
+
+  const userMsg = {
+    sender: "user",
+    text: text.trim(),
+    ts: Date.now()
+  };
+
+  messages.push(userMsg);
+  persist();
+  messagesEl.appendChild(makeRow(userMsg));
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  inputEl.value = "";
+
+  // Start typing indicator
+  showTyping(true);
+
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, sessionId })
+    });
+
+    if (!res.ok) throw new Error("Server error");
+
+    const data = await res.json();
+    const reply = data.reply || data.answer || "⚠ No reply from server.";
+
+    const botMsg = { sender: "bot", text: reply, ts: Date.now() };
+    messages.push(botMsg);
+    persist();
+
+    showTyping(false);
+    messagesEl.appendChild(makeRow(botMsg));
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  } catch (err) {
+    showTyping(false);
+    const errMsg = {
+      sender: "bot",
+      text: "❌ Cannot reach backend. Please check your server or CORS settings.",
+      ts: Date.now()
+    };
+
+    messages.push(errMsg);
+    persist();
+    messagesEl.appendChild(makeRow(errMsg));
+    console.error("Backend error:", err);
+  }
+}
+
+// UI Handlers
+sendBtn.addEventListener("click", () => {
+  const v = inputEl.value;
+  if (v) sendMessage(v);
+});
+
+inputEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendBtn.click();
+  }
+});
+clearBtn.addEventListener("click", () => {
+  messages = [];
+  persist();
+  messagesEl.innerHTML = "";
+
+  sessionId = "sess_" + Math.random().toString(36).slice(2, 10);
+  localStorage.setItem(SESSION_KEY, sessionId);
+});
+
+
+// Suggestions
+if (suggestionsEl) {
+  suggestionsEl.addEventListener("click", (e) => {
+    if (e.target.tagName === "BUTTON") {
+      inputEl.value = e.target.textContent;
+      inputEl.focus();
+    }
+  });
+}
+
+// Speech Recognition (if supported)
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (window.SpeechRecognition) {
+  const rec = new window.SpeechRecognition();
+  rec.lang = "en-IN";
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+
+  voiceBtn.addEventListener("click", () => {
+    try {
+      rec.start();
+      voiceBtn.classList.add("listening");
+    } catch {}
+  });
+
+  rec.addEventListener("result", (e) => {
+    const text = e.results[0][0].transcript;
+    inputEl.value = text;
+    sendMessage(text);
+  });
+
+  rec.addEventListener("end", () => voiceBtn.classList.remove("listening"));
+} else {
+  voiceBtn.style.display = "none";
+}
+
+// Developer Helper
+window.clearCollegeChat = function () {
+  messages = [];
+  persist();
+  renderAll();
+};
+
+// First-Time Greeting
+if (messages.length === 0) {
+  const greet = {
+    sender: "bot",
+    text: "Welcome to Campus AI — Ask about schedules, events, fees, academics, or general questions!",
+    ts: Date.now()
+  };
+  messages.push(greet);
+  persist();
+}
+
+// Render on load
+renderAll();
+</script>
+</body>
+</html>
