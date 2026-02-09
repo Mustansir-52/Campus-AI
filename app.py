@@ -82,6 +82,30 @@ def extract_timetable(day_order, pdf_text):
     
     return f"Timetable for Day Order {day_order} not found."
 
+# ---------------------- CONTEXT REDUCTION ----------------------
+
+def get_relevant_context(message, pdf_text, max_chars=1200):
+    """Return the most relevant PDF snippets to reduce prompt size."""
+    if not pdf_text:
+        return ""
+
+    tokens = {t for t in re.findall(r"\w+", message.lower()) if len(t) > 2}
+    if not tokens:
+        return pdf_text[:max_chars]
+
+    matches = []
+    for line in pdf_text.splitlines():
+        lower_line = line.lower()
+        if any(token in lower_line for token in tokens):
+            matches.append(line.strip())
+        if sum(len(m) for m in matches) >= max_chars:
+            break
+
+    if not matches:
+        return pdf_text[:max_chars]
+
+    return "\n".join(matches)[:max_chars]
+
 # ---------------------- DATE UTIL ----------------------
 
 def get_day_order(date):
@@ -181,11 +205,12 @@ def chat():
         
         # Build compact context
         recent_history = sessions[session_id][-4:] if len(sessions[session_id]) > 4 else sessions[session_id]
-        
+        relevant_context = get_relevant_context(message, college_data)
+
         prompt = f"""You are CampusGuide AI for The New College.
 
 College Data:
-{college_data[:3000]}
+{relevant_context}
 
 Recent Chat:
 {json.dumps(recent_history[-2:])}
